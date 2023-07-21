@@ -9,9 +9,8 @@ import { UUIDType } from '../types/uuid.js';
 import { profiles } from './profiles.js';
 import { posts } from './posts.js';
 import { prismaCopy } from '../index.js';
-import { SubscribersOnAuthors } from './subscrubers.js';
 
-export const userType = new GraphQLObjectType({
+export const userType: GraphQLObjectType<any, any> = new GraphQLObjectType({
   name: 'users',
   fields: () => ({
     id: {
@@ -28,11 +27,14 @@ export const userType = new GraphQLObjectType({
       resolve(parent: { id: string }) {
         return prismaCopy.profile.findUnique({
           where: { userId: parent.id },
+          include: {
+            memberType: true,
+          },
         });
       },
     },
     posts: {
-      type: new GraphQLList(posts),
+      type: new GraphQLList(new GraphQLNonNull(posts)),
       resolve(parent: { id: string }) {
         return prismaCopy.post.findMany({
           where: { authorId: parent.id },

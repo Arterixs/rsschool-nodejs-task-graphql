@@ -19,21 +19,3 @@ export const SubscribersOnAuthors = new GraphQLObjectType({
     },
   }),
 });
-
-export const subscribedToUser = new GraphQLObjectType({
-  name: 'subscribedToUser',
-  fields: () => ({
-    subscriber: {
-      type: userType,
-    },
-    subscriberId: {
-      type: UUIDType,
-    },
-    author: {
-      type: userType,
-    },
-    authorId: {
-      type: UUIDType,
-    },
-  }),
-});
