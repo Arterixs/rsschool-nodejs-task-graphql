@@ -4,6 +4,7 @@ import { UUIDType } from '../types/uuid.js';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library.js';
 import { posts } from './posts.js';
+import { users } from './users.js';
 
 export const getQueryTypes = (
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
@@ -47,6 +48,12 @@ export const getQueryTypes = (
           return await prisma.post.findFirst({
             where: { id: args.id },
           });
+        },
+      },
+      users: {
+        type: new GraphQLList(users),
+        resolve: async (_source) => {
+          return await prisma.user.findMany();
         },
       },
     }),
