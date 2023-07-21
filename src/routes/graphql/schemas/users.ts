@@ -9,6 +9,7 @@ import { UUIDType } from '../types/uuid.js';
 import { profiles } from './profiles.js';
 import { posts } from './posts.js';
 import { prismaCopy } from '../index.js';
+import { SubscribersOnAuthors } from './subscrubers.js';
 
 export const userType = new GraphQLObjectType({
   name: 'users',
@@ -35,6 +36,34 @@ export const userType = new GraphQLObjectType({
       resolve(parent: { id: string }) {
         return prismaCopy.post.findMany({
           where: { authorId: parent.id },
+        });
+      },
+    },
+    userSubscribedTo: {
+      type: new GraphQLList(userType),
+      resolve(parent: { id: string }) {
+        return prismaCopy.user.findMany({
+          where: {
+            subscribedToUser: {
+              some: {
+                subscriberId: parent.id,
+              },
+            },
+          },
+        });
+      },
+    },
+    subscribedToUser: {
+      type: new GraphQLList(userType),
+      resolve(parent: { id: string }) {
+        return prismaCopy.user.findMany({
+          where: {
+            userSubscribedTo: {
+              some: {
+                authorId: parent.id,
+              },
+            },
+          },
         });
       },
     },
