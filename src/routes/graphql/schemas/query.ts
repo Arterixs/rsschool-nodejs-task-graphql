@@ -56,6 +56,21 @@ export const getQueryTypes = (
           return await prisma.user.findMany();
         },
       },
+      user: {
+        type: users,
+        args: {
+          id: {
+            type: UUIDType,
+          },
+        },
+        resolve: async (_parent, args: { id: string }) => {
+          if (args.id) {
+            return await prisma.user.findFirst({
+              where: { id: args.id },
+            });
+          }
+        },
+      },
     }),
   });
 
