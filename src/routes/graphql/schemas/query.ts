@@ -1,15 +1,17 @@
 import { GraphQLList, GraphQLObjectType } from 'graphql';
-import { member, memberTypeEnum } from './memberTypes.js';
+import { member, memberEnum } from './memberTypes.js';
 import { UUIDType } from '../types/uuid.js';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library.js';
 import { posts } from './posts.js';
-import { users } from './users.js';
+import { getPostQL } from './users.js';
 import { profiles } from './profiles.js';
+import { MemberTypeId } from '../../member-types/schemas.js';
 
 export const getQueryTypes = (
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-): GraphQLObjectType<any, any> => {
+): Map<any, any> => {
+  const userType = getPostQL(prisma);
   const queryType = new GraphQLObjectType({
     name: 'Query',
     fields: () => ({
@@ -23,11 +25,11 @@ export const getQueryTypes = (
         type: member,
         args: {
           id: {
-            type: memberTypeEnum,
+            type: memberEnum,
           },
         },
-        resolve: async (_parent, args: { id: string }) => {
-          return await prisma.memberType.findFirst({
+        resolve: async (_parent, args: { id: MemberTypeId }) => {
+          return await prisma.memberType.findUnique({
             where: { id: args.id },
           });
         },
@@ -46,30 +48,28 @@ export const getQueryTypes = (
           },
         },
         resolve: async (_parent, args: { id: string }) => {
-          return await prisma.post.findFirst({
+          return await prisma.post.findUnique({
             where: { id: args.id },
           });
         },
       },
       users: {
-        type: new GraphQLList(users),
+        type: new GraphQLList(userType),
         resolve: async (_source) => {
           return await prisma.user.findMany();
         },
       },
       user: {
-        type: users,
+        type: userType,
         args: {
           id: {
             type: UUIDType,
           },
         },
         resolve: async (_parent, args: { id: string }) => {
-          if (args.id) {
-            return await prisma.user.findFirst({
-              where: { id: args.id },
-            });
-          }
+          return await prisma.user.findUnique({
+            where: { id: args.id },
+          });
         },
       },
       profiles: {
@@ -86,15 +86,16 @@ export const getQueryTypes = (
           },
         },
         resolve: async (_parent, args: { id: string }) => {
-          if (args.id) {
-            return await prisma.profile.findFirst({
-              where: { id: args.id },
-            });
-          }
+          return await prisma.profile.findUnique({
+            where: { id: args.id },
+          });
         },
       },
     }),
   });
+  const storage = new Map();
+  storage.set(1, queryType);
+  storage.set(2, userType);
 
-  return queryType;
+  return storage;
 };
