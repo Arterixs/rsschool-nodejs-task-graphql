@@ -1,21 +1,23 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
-import { graphql, Source, GraphQLSchema, GraphQLObjectType } from 'graphql';
+import { graphql, Source, GraphQLSchema } from 'graphql';
 import { member, memberEnum } from './schemas/memberTypes.js';
-import { getQueryTypes } from './schemas/query.js';
 import { posts } from './schemas/posts.js';
 import { profiles } from './schemas/profiles.js';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library.js';
+import { userType } from './schemas/users.js';
+import { queryType } from './schemas/query.js';
+
+export let prismaCopy = {} as PrismaClient<
+  Prisma.PrismaClientOptions,
+  never,
+  DefaultArgs
+>;
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
-  const storage = getQueryTypes(prisma);
-  const queryType = storage.get(1) as GraphQLObjectType<any, any>;
-  const userType = storage.get(2) as GraphQLObjectType<
-    {
-      id: string;
-    },
-    any
-  >;
+  prismaCopy = prisma;
 
   const schema = new GraphQLSchema({
     query: queryType,

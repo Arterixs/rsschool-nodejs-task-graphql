@@ -1,8 +1,9 @@
 import { GraphQLObjectType, GraphQLBoolean, GraphQLInt, GraphQLNonNull } from 'graphql';
 import { UUIDType } from '../types/uuid.js';
-import { memberEnum } from './memberTypes.js';
+import { member, memberEnum } from './memberTypes.js';
+import { userType } from './users.js';
 
-export const profiles = new GraphQLObjectType({
+export const profiles: GraphQLObjectType<any, any> = new GraphQLObjectType({
   name: 'profiles',
   fields: () => ({
     id: {
@@ -19,6 +20,12 @@ export const profiles = new GraphQLObjectType({
     },
     memberTypeId: {
       type: memberEnum,
+    },
+    memberType: {
+      type: member,
+    },
+    user: {
+      type: userType,
     },
   }),
 });

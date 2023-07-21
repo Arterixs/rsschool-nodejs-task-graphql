@@ -2,9 +2,12 @@ import {
   GraphQLEnumType,
   GraphQLFloat,
   GraphQLInt,
+  GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
 } from 'graphql';
+import { profiles } from './profiles.js';
+import { prismaCopy } from '../index.js';
 
 export const memberEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
@@ -29,6 +32,14 @@ export const member = new GraphQLObjectType({
     },
     postsLimitPerMonth: {
       type: GraphQLInt,
+    },
+    profiles: {
+      type: new GraphQLList(profiles),
+      resolve(parent: { id: string }) {
+        return prismaCopy.profile.findMany({
+          where: { memberTypeId: parent.id },
+        });
+      },
     },
   }),
 });

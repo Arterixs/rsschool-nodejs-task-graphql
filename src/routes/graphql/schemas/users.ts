@@ -8,41 +8,35 @@ import {
 import { UUIDType } from '../types/uuid.js';
 import { profiles } from './profiles.js';
 import { posts } from './posts.js';
-import { DefaultArgs } from '@prisma/client/runtime/library.js';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { prismaCopy } from '../index.js';
 
-export const getPostQL = (
-  prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-) => {
-  const userType = new GraphQLObjectType({
-    name: 'users',
-    fields: () => ({
-      id: {
-        type: new GraphQLNonNull(UUIDType),
+export const userType = new GraphQLObjectType({
+  name: 'users',
+  fields: () => ({
+    id: {
+      type: new GraphQLNonNull(UUIDType),
+    },
+    name: {
+      type: GraphQLString,
+    },
+    balance: {
+      type: GraphQLFloat,
+    },
+    profile: {
+      type: profiles,
+      resolve(parent: { id: string }) {
+        return prismaCopy.profile.findUnique({
+          where: { userId: parent.id },
+        });
       },
-      name: {
-        type: GraphQLString,
+    },
+    posts: {
+      type: new GraphQLList(posts),
+      resolve(parent: { id: string }) {
+        return prismaCopy.post.findMany({
+          where: { authorId: parent.id },
+        });
       },
-      balance: {
-        type: GraphQLFloat,
-      },
-      profile: {
-        type: profiles,
-        resolve(parent: { id: string }) {
-          return prisma.profile.findUnique({
-            where: { userId: parent.id },
-          });
-        },
-      },
-      posts: {
-        type: new GraphQLList(posts),
-        resolve(parent: { id: string }) {
-          return prisma.post.findMany({
-            where: { authorId: parent.id },
-          });
-        },
-      },
-    }),
-  });
-  return userType;
-};
+    },
+  }),
+});
