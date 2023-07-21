@@ -5,6 +5,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library.js';
 import { posts } from './posts.js';
 import { users } from './users.js';
+import { profiles } from './profiles.js';
 
 export const getQueryTypes = (
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
@@ -66,6 +67,27 @@ export const getQueryTypes = (
         resolve: async (_parent, args: { id: string }) => {
           if (args.id) {
             return await prisma.user.findFirst({
+              where: { id: args.id },
+            });
+          }
+        },
+      },
+      profiles: {
+        type: new GraphQLList(profiles),
+        resolve: async (_source) => {
+          return await prisma.profile.findMany();
+        },
+      },
+      profile: {
+        type: profiles,
+        args: {
+          id: {
+            type: UUIDType,
+          },
+        },
+        resolve: async (_parent, args: { id: string }) => {
+          if (args.id) {
+            return await prisma.profile.findFirst({
               where: { id: args.id },
             });
           }
