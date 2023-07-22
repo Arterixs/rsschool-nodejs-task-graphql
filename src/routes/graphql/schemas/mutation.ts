@@ -1,4 +1,4 @@
-import { GraphQLObjectType } from 'graphql';
+import { GraphQLBoolean, GraphQLObjectType, GraphQLString } from 'graphql';
 import { posts } from './posts.js';
 import { prismaCopy } from '../index.js';
 import { userType } from './users.js';
@@ -7,6 +7,11 @@ import { PostCreate, ProfileCreate, UserCreate } from '../types/interface.js';
 import { postInput } from './mutations/post.js';
 import { userInput } from './mutations/user.js';
 import { profileInput } from './mutations/profile.js';
+import { UUIDType } from '../types/uuid.js';
+
+type Id = {
+  id: string;
+};
 
 export const mutationType = new GraphQLObjectType({
   name: 'Mutation',
@@ -36,6 +41,48 @@ export const mutationType = new GraphQLObjectType({
       },
       resolve: async (_parent, args: ProfileCreate) => {
         return await prismaCopy.profile.create({ data: { ...args.dto } });
+      },
+    },
+    deletePost: {
+      type: GraphQLBoolean,
+      args: {
+        id: { type: UUIDType },
+      },
+      resolve: async (_parent, args: Id) => {
+        try {
+          await prismaCopy.post.delete({ where: { id: args.id } });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    },
+    deleteUser: {
+      type: GraphQLBoolean,
+      args: {
+        id: { type: UUIDType },
+      },
+      resolve: async (_parent, args: Id) => {
+        try {
+          await prismaCopy.user.delete({ where: { id: args.id } });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    },
+    deleteProfile: {
+      type: GraphQLBoolean,
+      args: {
+        id: { type: UUIDType },
+      },
+      resolve: async (_parent, args: Id) => {
+        try {
+          await prismaCopy.profile.delete({ where: { id: args.id } });
+          return true;
+        } catch {
+          return false;
+        }
       },
     },
   },
