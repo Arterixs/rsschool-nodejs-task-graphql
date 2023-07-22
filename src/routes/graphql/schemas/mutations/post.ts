@@ -9,3 +9,12 @@ export const postInput = new GraphQLInputObjectType({
     authorId: { type: UUIDType },
   }),
 });
+
+export const changePostInput = new GraphQLInputObjectType({
+  name: 'ChangePostInput',
+  fields: () => ({
+    title: { type: GraphQLString },
+    content: { type: GraphQLString },
+    authorId: { type: UUIDType },
+  }),
+});

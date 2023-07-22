@@ -1,3 +1,7 @@
+export type PostChange = PostCreate & Id;
+export type ProfileChange = { dto: Omit<ProfileInput, 'userId'> } & Id;
+export type UserChange = UserCreate & Id;
+
 export type PostCreate = {
   dto: PostInput;
 };
@@ -8,6 +12,10 @@ export type UserCreate = {
 
 export type ProfileCreate = {
   dto: ProfileInput;
+};
+
+export type Id = {
+  id: string;
 };
 
 interface PostInput {

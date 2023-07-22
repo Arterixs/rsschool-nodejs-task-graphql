@@ -3,15 +3,19 @@ import { posts } from './posts.js';
 import { prismaCopy } from '../index.js';
 import { userType } from './users.js';
 import { profiles } from './profiles.js';
-import { PostCreate, ProfileCreate, UserCreate } from '../types/interface.js';
-import { postInput } from './mutations/post.js';
-import { userInput } from './mutations/user.js';
-import { profileInput } from './mutations/profile.js';
+import {
+  Id,
+  PostChange,
+  PostCreate,
+  ProfileChange,
+  ProfileCreate,
+  UserChange,
+  UserCreate,
+} from '../types/interface.js';
+import { changePostInput, postInput } from './mutations/post.js';
+import { changeUserInput, userInput } from './mutations/user.js';
+import { changeProfileInput, profileInput } from './mutations/profile.js';
 import { UUIDType } from '../types/uuid.js';
-
-type Id = {
-  id: string;
-};
 
 export const mutationType = new GraphQLObjectType({
   name: 'Mutation',
@@ -83,6 +87,45 @@ export const mutationType = new GraphQLObjectType({
         } catch {
           return false;
         }
+      },
+    },
+    changePost: {
+      type: posts,
+      args: {
+        dto: { type: changePostInput },
+        id: { type: UUIDType },
+      },
+      resolve: async (_parent, args: PostChange) => {
+        return await prismaCopy.post.update({
+          where: { id: args.id },
+          data: { ...args.dto },
+        });
+      },
+    },
+    changeUser: {
+      type: userType,
+      args: {
+        dto: { type: changeUserInput },
+        id: { type: UUIDType },
+      },
+      resolve: async (_parent, args: UserChange) => {
+        return await prismaCopy.user.update({
+          where: { id: args.id },
+          data: { ...args.dto },
+        });
+      },
+    },
+    changeProfile: {
+      type: profiles,
+      args: {
+        dto: { type: changeProfileInput },
+        id: { type: UUIDType },
+      },
+      resolve: async (_parent, args: ProfileChange) => {
+        return await prismaCopy.profile.update({
+          where: { id: args.id },
+          data: { ...args.dto },
+        });
       },
     },
   },
