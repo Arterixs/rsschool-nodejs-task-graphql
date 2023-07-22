@@ -9,6 +9,7 @@ import {
   PostCreate,
   ProfileChange,
   ProfileCreate,
+  Subscrubers,
   UserChange,
   UserCreate,
 } from '../types/interface.js';
@@ -16,6 +17,7 @@ import { changePostInput, postInput } from './mutations/post.js';
 import { changeUserInput, userInput } from './mutations/user.js';
 import { changeProfileInput, profileInput } from './mutations/profile.js';
 import { UUIDType } from '../types/uuid.js';
+import { SubscribersOnAuthors } from './subscrubers.js';
 
 export const mutationType = new GraphQLObjectType({
   name: 'Mutation',
@@ -126,6 +128,49 @@ export const mutationType = new GraphQLObjectType({
           where: { id: args.id },
           data: { ...args.dto },
         });
+      },
+    },
+    subscribeTo: {
+      type: userType,
+      args: {
+        userId: { type: UUIDType },
+        authorId: { type: UUIDType },
+      },
+      resolve: async (_parent, args: Subscrubers) => {
+        return await prismaCopy.user.update({
+          where: {
+            id: args.userId,
+          },
+          data: {
+            userSubscribedTo: {
+              create: {
+                authorId: args.authorId,
+              },
+            },
+          },
+        });
+      },
+    },
+    unsubscribeFrom: {
+      type: GraphQLBoolean,
+      args: {
+        userId: { type: UUIDType },
+        authorId: { type: UUIDType },
+      },
+      resolve: async (_parent, args: Subscrubers) => {
+        try {
+          await prismaCopy.subscribersOnAuthors.delete({
+            where: {
+              subscriberId_authorId: {
+                subscriberId: args.userId,
+                authorId: args.authorId,
+              },
+            },
+          });
+          return true;
+        } catch {
+          return false;
+        }
       },
     },
   },

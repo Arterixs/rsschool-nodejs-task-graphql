@@ -18,6 +18,11 @@ export type Id = {
   id: string;
 };
 
+export interface Subscrubers {
+  userId: string;
+  authorId: string;
+}
+
 interface PostInput {
   title: string;
   content: string;
