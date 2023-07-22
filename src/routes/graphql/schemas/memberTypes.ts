@@ -15,7 +15,7 @@ export const memberEnum = new GraphQLEnumType({
     basic: {
       value: 'basic',
     },
-    businnes: {
+    business: {
       value: 'business',
     },
   },

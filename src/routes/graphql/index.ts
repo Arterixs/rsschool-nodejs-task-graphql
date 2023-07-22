@@ -8,6 +8,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library.js';
 import { userType } from './schemas/users.js';
 import { queryType } from './schemas/query.js';
+import { mutationType } from './schemas/mutation.js';
 
 export let prismaCopy = {} as PrismaClient<
   Prisma.PrismaClientOptions,
@@ -21,6 +22,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
 
   const schema = new GraphQLSchema({
     query: queryType,
+    mutation: mutationType,
     types: [member, memberEnum, posts, userType, profiles],
   });
 
