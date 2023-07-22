@@ -1,4 +1,4 @@
-import { GraphQLBoolean, GraphQLObjectType, GraphQLString } from 'graphql';
+import { GraphQLBoolean, GraphQLObjectType } from 'graphql';
 import { posts } from './posts.js';
 import { prismaCopy } from '../index.js';
 import { userType } from './users.js';
@@ -17,7 +17,6 @@ import { changePostInput, postInput } from './mutations/post.js';
 import { changeUserInput, userInput } from './mutations/user.js';
 import { changeProfileInput, profileInput } from './mutations/profile.js';
 import { UUIDType } from '../types/uuid.js';
-import { SubscribersOnAuthors } from './subscrubers.js';
 
 export const mutationType = new GraphQLObjectType({
   name: 'Mutation',
