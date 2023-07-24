@@ -40,6 +40,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         variableValues: variables,
         contextValue: {
           prisma,
+          dataLoaders: new WeakMap(),
         },
       });
     },

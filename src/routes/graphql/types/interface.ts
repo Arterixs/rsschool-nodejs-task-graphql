@@ -21,6 +21,10 @@ export type Id = {
   id: string;
 };
 
+export type MemberId = {
+  memberTypeId: string;
+};
+
 export interface Subscrubers {
   userId: string;
   authorId: string;
@@ -64,6 +68,7 @@ export interface memberType {
 
 export interface Context {
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
+  dataLoaders: WeakMap<object, any>;
 }
 
 interface PostInput {
