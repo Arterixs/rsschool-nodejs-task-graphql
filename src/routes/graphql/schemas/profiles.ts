@@ -3,7 +3,7 @@ import { UUIDType } from '../types/uuid.js';
 import { member, memberEnum } from './memberTypes.js';
 import { userType } from './users.js';
 
-export const profiles: GraphQLObjectType<any, any> = new GraphQLObjectType({
+export const profiles: GraphQLObjectType<string, () => void> = new GraphQLObjectType({
   name: 'profiles',
   fields: () => ({
     id: {

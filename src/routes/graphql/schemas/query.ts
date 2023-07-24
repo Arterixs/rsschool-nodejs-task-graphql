@@ -5,11 +5,6 @@ import { posts } from './posts.js';
 import { userType } from './users.js';
 import { profiles } from './profiles.js';
 import { MemberTypeId } from '../../member-types/schemas.js';
-import {
-  parseResolveInfo,
-  simplifyParsedResolveInfoFragmentWithType,
-  ResolveTree,
-} from 'graphql-parse-resolve-info';
 import { Context, Id } from '../types/interface.js';
 
 export const queryType = new GraphQLObjectType({
@@ -55,13 +50,7 @@ export const queryType = new GraphQLObjectType({
     },
     users: {
       type: new GraphQLList(userType),
-      resolve: async (_source, _args, { prisma }: Context, info) => {
-        const parsedResolveInfoFragment = parseResolveInfo(info);
-        const { fields }: { fields: { [key in string]: ResolveTree } } =
-          simplifyParsedResolveInfoFragmentWithType(
-            parsedResolveInfoFragment as ResolveTree,
-            new GraphQLList(userType),
-          );
+      resolve: async (_source, _args, { prisma }: Context) => {
         return await prisma.user.findMany();
       },
     },

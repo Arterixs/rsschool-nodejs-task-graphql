@@ -10,7 +10,7 @@ import { profiles } from './profiles.js';
 import { posts } from './posts.js';
 import { Context, Id } from '../types/interface.js';
 
-export const userType: GraphQLObjectType<any, any> = new GraphQLObjectType({
+export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
   name: 'users',
   fields: () => ({
     id: {

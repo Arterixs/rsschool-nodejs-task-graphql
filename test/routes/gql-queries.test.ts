@@ -210,7 +210,7 @@ await test('gql-queries', async (t) => {
     await subscribeTo(app, user3.id, user1.id);
 
     const {
-      body: { data: data, errors },
+      body: { data: data },
     } = await gqlQuery(app, {
       query: `query ($userId: UUID!) {
           user(id: $userId) {
