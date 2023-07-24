@@ -29,24 +29,22 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
         const { dataLoaders, prisma } = context;
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl = dataLoaders.get(info.fieldNodes);
+        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
-            const rows = await prisma.profile.findMany({
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const profiles = await prisma.profile.findMany({
               where: { userId: { in: ids as string[] } },
               include: {
                 memberType: true,
               },
             });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            const sortedInIdsOrder = ids.map((id) => rows.find((x) => x.userId === id));
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            const sortedInIdsOrder = ids.map((id) =>
+              profiles.find((profile) => profile.userId === id),
+            );
             return sortedInIdsOrder;
           });
           dataLoaders.set(info.fieldNodes, dl);
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return await dl.load(parent.id);
       },
     },
@@ -55,23 +53,19 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
       resolve: async (parent: Id, _args, context: Context, info) => {
         const { dataLoaders, prisma } = context;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl = dataLoaders.get(info.fieldNodes);
+        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
-            const rows = await prisma.post.findMany({
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const posts = await prisma.post.findMany({
               where: { authorId: { in: ids as string[] } },
             });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             const sortedInIdsOrder = ids.map((id) =>
-              rows.filter((x) => x.authorId === id),
+              posts.filter((post) => post.authorId === id),
             );
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return sortedInIdsOrder;
           });
           dataLoaders.set(info.fieldNodes, dl);
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return await dl.load(parent.id);
       },
     },
@@ -81,11 +75,10 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
         const { dataLoaders, prisma } = context;
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl = dataLoaders.get(info.fieldNodes);
+        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
-            const rows = await prisma.user.findMany({
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const users = await prisma.user.findMany({
               where: {
                 subscribedToUser: {
                   some: {
@@ -97,18 +90,15 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
                 subscribedToUser: true,
               },
             });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             const sortedInIdsOrder = ids.map((id) =>
-              rows.filter((x) =>
-                x.subscribedToUser.find((subs) => subs.subscriberId === id),
+              users.filter((user) =>
+                user.subscribedToUser.find((subs) => subs.subscriberId === id),
               ),
             );
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return sortedInIdsOrder;
           });
           dataLoaders.set(info.fieldNodes, dl);
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return await dl.load(parent.id);
       },
     },
@@ -118,11 +108,10 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
         const { dataLoaders, prisma } = context;
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl = dataLoaders.get(info.fieldNodes);
+        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
-            const rows = await prisma.user.findMany({
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const users = await prisma.user.findMany({
               where: {
                 userSubscribedTo: {
                   some: {
@@ -134,16 +123,15 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
                 userSubscribedTo: true,
               },
             });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             const sortedInIdsOrder = ids.map((id) =>
-              rows.filter((x) => x.userSubscribedTo.find((subs) => subs.authorId === id)),
+              users.filter((user) =>
+                user.userSubscribedTo.find((subs) => subs.authorId === id),
+              ),
             );
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return sortedInIdsOrder;
           });
           dataLoaders.set(info.fieldNodes, dl);
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return await dl.load(parent.id);
       },
     },

@@ -2,7 +2,7 @@ import { GraphQLObjectType, GraphQLBoolean, GraphQLInt, GraphQLNonNull } from 'g
 import { UUIDType } from '../types/uuid.js';
 import { member, memberEnum } from './memberTypes.js';
 import { userType } from './users.js';
-import { Context, Profile, memberType } from '../types/interface.js';
+import { Context, Profile } from '../types/interface.js';
 import DataLoader from 'dataloader';
 
 export const profiles: GraphQLObjectType<Profile, Context> = new GraphQLObjectType({
@@ -27,23 +27,20 @@ export const profiles: GraphQLObjectType<Profile, Context> = new GraphQLObjectTy
       type: member,
       resolve: async (parent: Profile, _args, context: Context, info) => {
         const { dataLoaders, prisma } = context;
-
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl = dataLoaders.get(info.fieldNodes);
+        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
-            const rows = await prisma.memberType.findMany({
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const members = await prisma.memberType.findMany({
               where: { id: { in: ids as string[] } },
             });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            const sortedInIdsOrder = ids.map((id) => rows.find((x) => x.id === id));
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            const sortedInIdsOrder = ids.map((id) =>
+              members.find((member) => member.id === id),
+            );
             return sortedInIdsOrder;
           });
           dataLoaders.set(info.fieldNodes, dl);
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return await dl.load(parent.memberTypeId);
       },
     },
