@@ -28,8 +28,7 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
       resolve: async (parent: Id, _args, context: Context, info) => {
         const { dataLoaders, prisma } = context;
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
+        let dl = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
             const profiles = await prisma.profile.findMany({
@@ -52,8 +51,8 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
       type: new GraphQLList(new GraphQLNonNull(posts)),
       resolve: async (parent: Id, _args, context: Context, info) => {
         const { dataLoaders, prisma } = context;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
+
+        let dl = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
             const posts = await prisma.post.findMany({
@@ -73,9 +72,7 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
       type: new GraphQLList(userType),
       resolve: async (parent: Id, _args, context: Context, info) => {
         const { dataLoaders, prisma } = context;
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
+        let dl = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
             const users = await prisma.user.findMany({
@@ -107,8 +104,7 @@ export const userType: GraphQLObjectType<Id, Context> = new GraphQLObjectType({
       resolve: async (parent: Id, _args, context: Context, info) => {
         const { dataLoaders, prisma } = context;
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        let dl: DataLoader<string, unknown, string> = dataLoaders.get(info.fieldNodes);
+        let dl = dataLoaders.get(info.fieldNodes);
         if (!dl) {
           dl = new DataLoader(async (ids: readonly string[]) => {
             const users = await prisma.user.findMany({

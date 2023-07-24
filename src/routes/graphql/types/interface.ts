@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library.js';
+import DataLoader from 'dataloader';
 
 export type PostChange = PostCreate & Id;
 export type ProfileChange = { dto: Omit<ProfileInput, 'userId'> } & Id;
@@ -62,13 +63,11 @@ export interface memberType {
   id: string;
   discount: number;
   postsLimitPerMonth: number;
-
-  profiles: Profile[];
 }
 
 export interface Context {
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
-  dataLoaders: WeakMap<object, any>;
+  dataLoaders: WeakMap<object, DataLoader<string, unknown, string>>;
 }
 
 interface PostInput {
