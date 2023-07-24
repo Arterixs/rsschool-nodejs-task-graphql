@@ -5,15 +5,20 @@ import { posts } from './posts.js';
 import { userType } from './users.js';
 import { profiles } from './profiles.js';
 import { MemberTypeId } from '../../member-types/schemas.js';
-import { prismaCopy } from '../index.js';
+import {
+  parseResolveInfo,
+  simplifyParsedResolveInfoFragmentWithType,
+  ResolveTree,
+} from 'graphql-parse-resolve-info';
+import { Context, Id } from '../types/interface.js';
 
 export const queryType = new GraphQLObjectType({
   name: 'Query',
   fields: () => ({
     memberTypes: {
       type: new GraphQLList(member),
-      resolve: async (_parent) => {
-        return await prismaCopy.memberType.findMany();
+      resolve: async (_parent, _args, { prisma }: Context) => {
+        return await prisma.memberType.findMany();
       },
     },
     memberType: {
@@ -23,16 +28,16 @@ export const queryType = new GraphQLObjectType({
           type: memberEnum,
         },
       },
-      resolve: async (_parent, args: { id: MemberTypeId }) => {
-        return await prismaCopy.memberType.findUnique({
+      resolve: async (_parent, args: { id: MemberTypeId }, { prisma }: Context) => {
+        return await prisma.memberType.findUnique({
           where: { id: args.id },
         });
       },
     },
     posts: {
       type: new GraphQLList(posts),
-      resolve: async (_source) => {
-        return await prismaCopy.post.findMany();
+      resolve: async (_source, _args, { prisma }: Context) => {
+        return await prisma.post.findMany();
       },
     },
     post: {
@@ -42,16 +47,22 @@ export const queryType = new GraphQLObjectType({
           type: UUIDType,
         },
       },
-      resolve: async (_parent, args: { id: string }) => {
-        return await prismaCopy.post.findUnique({
+      resolve: async (_parent, args: Id, { prisma }: Context) => {
+        return await prisma.post.findUnique({
           where: { id: args.id },
         });
       },
     },
     users: {
       type: new GraphQLList(userType),
-      resolve: async (_source) => {
-        return await prismaCopy.user.findMany();
+      resolve: async (_source, _args, { prisma }: Context, info) => {
+        const parsedResolveInfoFragment = parseResolveInfo(info);
+        const { fields }: { fields: { [key in string]: ResolveTree } } =
+          simplifyParsedResolveInfoFragmentWithType(
+            parsedResolveInfoFragment as ResolveTree,
+            new GraphQLList(userType),
+          );
+        return await prisma.user.findMany();
       },
     },
     user: {
@@ -61,16 +72,16 @@ export const queryType = new GraphQLObjectType({
           type: UUIDType,
         },
       },
-      resolve: async (_parent, args: { id: string }) => {
-        return await prismaCopy.user.findUnique({
+      resolve: async (_parent, args: Id, { prisma }: Context) => {
+        return await prisma.user.findUnique({
           where: { id: args.id },
         });
       },
     },
     profiles: {
       type: new GraphQLList(profiles),
-      resolve: async (_source) => {
-        return await prismaCopy.profile.findMany();
+      resolve: async (_source, _args, { prisma }: Context) => {
+        return await prisma.profile.findMany();
       },
     },
     profile: {
@@ -80,8 +91,8 @@ export const queryType = new GraphQLObjectType({
           type: UUIDType,
         },
       },
-      resolve: async (_parent, args: { id: string }) => {
-        return await prismaCopy.profile.findUnique({
+      resolve: async (_parent, args: Id, { prisma }: Context) => {
+        return await prisma.profile.findUnique({
           where: { id: args.id },
           include: {
             user: true,

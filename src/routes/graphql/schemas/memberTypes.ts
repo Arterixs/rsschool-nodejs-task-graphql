@@ -7,7 +7,7 @@ import {
   GraphQLObjectType,
 } from 'graphql';
 import { profiles } from './profiles.js';
-import { prismaCopy } from '../index.js';
+import { Context, Id } from '../types/interface.js';
 
 export const memberEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
@@ -35,8 +35,8 @@ export const member = new GraphQLObjectType({
     },
     profiles: {
       type: new GraphQLList(profiles),
-      resolve(parent: { id: string }) {
-        return prismaCopy.profile.findMany({
+      resolve(parent: Id, _args, { prisma }: Context) {
+        return prisma.profile.findMany({
           where: { memberTypeId: parent.id },
         });
       },

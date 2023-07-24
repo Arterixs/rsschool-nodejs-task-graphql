@@ -8,7 +8,7 @@ import {
 import { UUIDType } from '../types/uuid.js';
 import { profiles } from './profiles.js';
 import { posts } from './posts.js';
-import { prismaCopy } from '../index.js';
+import { Context, Id } from '../types/interface.js';
 
 export const userType: GraphQLObjectType<any, any> = new GraphQLObjectType({
   name: 'users',
@@ -24,8 +24,8 @@ export const userType: GraphQLObjectType<any, any> = new GraphQLObjectType({
     },
     profile: {
       type: profiles,
-      resolve(parent: { id: string }) {
-        return prismaCopy.profile.findUnique({
+      resolve(parent: Id, _args, { prisma }: Context) {
+        return prisma.profile.findUnique({
           where: { userId: parent.id },
           include: {
             memberType: true,
@@ -35,16 +35,16 @@ export const userType: GraphQLObjectType<any, any> = new GraphQLObjectType({
     },
     posts: {
       type: new GraphQLList(new GraphQLNonNull(posts)),
-      resolve(parent: { id: string }) {
-        return prismaCopy.post.findMany({
+      resolve(parent: Id, _args, { prisma }: Context) {
+        return prisma.post.findMany({
           where: { authorId: parent.id },
         });
       },
     },
     userSubscribedTo: {
       type: new GraphQLList(userType),
-      resolve(parent: { id: string }) {
-        return prismaCopy.user.findMany({
+      resolve(parent: Id, _args, { prisma }: Context) {
+        return prisma.user.findMany({
           where: {
             subscribedToUser: {
               some: {
@@ -57,8 +57,8 @@ export const userType: GraphQLObjectType<any, any> = new GraphQLObjectType({
     },
     subscribedToUser: {
       type: new GraphQLList(userType),
-      resolve(parent: { id: string }) {
-        return prismaCopy.user.findMany({
+      resolve(parent: Id, _args, { prisma }: Context) {
+        return prisma.user.findMany({
           where: {
             userSubscribedTo: {
               some: {

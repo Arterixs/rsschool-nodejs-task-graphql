@@ -4,22 +4,13 @@ import { graphql, Source, GraphQLSchema, validate, parse } from 'graphql';
 import { member, memberEnum } from './schemas/memberTypes.js';
 import { posts } from './schemas/posts.js';
 import { profiles } from './schemas/profiles.js';
-import { Prisma, PrismaClient } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library.js';
 import { userType } from './schemas/users.js';
 import { queryType } from './schemas/query.js';
 import { mutationType } from './schemas/mutation.js';
 import depthLimit from 'graphql-depth-limit';
 
-export let prismaCopy = {} as PrismaClient<
-  Prisma.PrismaClientOptions,
-  never,
-  DefaultArgs
->;
-
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
-  prismaCopy = prisma;
 
   const schema = new GraphQLSchema({
     query: queryType,
@@ -47,6 +38,9 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         schema,
         source,
         variableValues: variables,
+        contextValue: {
+          prisma,
+        },
       });
     },
   });
